@@ -25,12 +25,17 @@ class Chain:
         self.class_mapping = yaml_dict['names']
 
         self.source = cv2.VideoCapture(input_video_path)
+        video_label = os.path.basename(input_video_path).split('.')[0]
 
-        if not os.path.exists(results_folder):
-            os.makedirs(results_folder)
+        out_videos_folder = os.path.join(results_folder, 'videos')
+        out_logs_folder = os.path.join(results_folder, 'logs')
+
+        for path in [out_videos_folder, out_logs_folder]:
+            if not os.path.exists(path):
+                os.makedirs(path)
 
         self.out_path = os.path.join(
-            results_folder, os.path.basename(input_video_path),
+            out_videos_folder, f'{video_label}.mp4',
         )
 
         width = int(self.source.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -43,6 +48,7 @@ class Chain:
 
         self.log_step_frames = log_step_frames
         self.curr_log_line = None
+        self.log_file = os.path.join(out_logs_folder, f'{video_label}.txt')
 
         self.model_inference_time = deque([], maxlen=self.log_step_frames)
         self.streamlit_flag = streamlit_log_flag
@@ -70,6 +76,9 @@ class Chain:
                 
                 if self.streamlit_flag:
                     st.text(self.curr_log_line)
+
+                with open(self.log_file, 'a') as f:
+                    f.write(self.curr_log_line + '\n')
 
             for cls_id, custom_label in self.class_mapping.items():
                 if cls_id in result.names: # check if the class id is in the results
