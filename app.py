@@ -64,7 +64,7 @@ def show_chain_results(
 def build_page(
     model_info_folder: str = 'model_info',
     class_labels_yaml_name: str = 'class_labels.yaml',
-    weights_filename: str = 'yolov8m.pt',
+    weights_filename: str = 'best.pt',
 ):
     st.title('Road signs recognition project')
 
