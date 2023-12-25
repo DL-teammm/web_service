@@ -77,7 +77,9 @@ class Chain:
                 if self.streamlit_flag:
                     st.text(self.curr_log_line)
 
-                with open(self.log_file, 'a') as f:
+                open_file_mode = 'w' if frame_count + 1 == self.log_step_frames else 'a'
+
+                with open(self.log_file, open_file_mode) as f:
                     f.write(self.curr_log_line + '\n')
 
             for cls_id, custom_label in self.class_mapping.items():
