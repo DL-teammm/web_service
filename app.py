@@ -35,23 +35,11 @@ def intro_info(clips_path: str = 'test_clips') -> str:
 
 
 def show_chain_results(
+    chain: Chain,
     input_video_path: str,
-    model_weights: str,
-    class_names_yaml: str,
-    device: str,
-    results_folder: str = 'results',
 ):
-    chain = Chain(
-        input_video_path,
-        results_folder,
-        model_weights,
-        class_names_yaml,
-        device=device,
-        streamlit_log_flag=True,
-    )
-
     with st.spinner('Chain inference...'):
-        out_path = chain.infer()
+        out_path = chain.infer(input_video_path)
 
     st.header('Results:')
     st.text(f'Rendered video saved at: {out_path}')
@@ -65,20 +53,30 @@ def build_page(
     model_info_folder: str = 'model_info',
     class_labels_yaml_name: str = 'class_labels.yaml',
     weights_filename: str = 'best.pt',
+    results_folder: str = 'results',
 ):
     st.title('Road signs recognition project')
 
     with st.sidebar:
         video_path, device = intro_info()
 
+    model_weights = os.path.join(
+        model_info_folder, weights_filename,
+    )
+    classes_yaml = os.path.join(
+        model_info_folder, class_labels_yaml_name,
+    )
+
+    chain = Chain(
+        results_folder,
+        model_weights,
+        classes_yaml,
+        device=device,
+        streamlit_log_flag=True,
+    )
+
     if video_path is not None:
-        model_weights = os.path.join(
-            model_info_folder, weights_filename,
-        )
-        classes_yaml = os.path.join(
-            model_info_folder, class_labels_yaml_name,
-        )
-        show_chain_results(video_path, model_weights, classes_yaml, device)
+        show_chain_results(chain, video_path)
 
 
 if __name__ == '__main__':
